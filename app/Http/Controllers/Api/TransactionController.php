@@ -42,4 +42,22 @@ class TransactionController extends Controller
             'balance' => $wallet->balance
         ]);
     }
+
+    public function transfer(Request $request)
+    {
+        $data = $request->validate([
+            'receiver_id' => 'required|exists:users,id',
+            'amount' => 'required|numeric|min:1'
+        ]);
+
+        $result = $this->transactionService->transfer(
+            $data['receiver_id'],
+            $data['amount']
+        );
+
+        return response()->json([
+            'message' => 'Transfer successful',
+            'balance' => $result['sender_balance']
+        ]);
+    }
 }

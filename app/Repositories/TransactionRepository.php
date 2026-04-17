@@ -13,5 +13,10 @@ class TransactionRepository
     {
         return Transaction::create($data);
     }
+    
+    public function createTransfer(array $data)
+    {
+        return Transaction::create($data);
+    }
 }
 

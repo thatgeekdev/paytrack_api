@@ -78,4 +78,53 @@ class TransactionService
             throw $e;
         }
     }
+
+    public function transfer(int $receiverId, float $amount)
+    {
+        $senderId = Auth::id();
+
+        if ($senderId == $receiverId) {
+            throw new Exception("Cannot transfer to yourself");
+        }
+
+        $senderWallet = $this->walletRepo->getByUserId($senderId);
+        $receiverWallet = $this->walletRepo->getByUserId($receiverId);
+
+        if (!$receiverWallet) {
+            throw new Exception("Receiver not found");
+        }
+
+        if ($senderWallet->balance < $amount) {
+            throw new Exception("Insufficient balance");
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // debit sender
+            $this->walletRepo->decrement($senderWallet, $amount);
+
+            // credit receiver
+            $this->walletRepo->increment($receiverWallet, $amount);
+
+            // record transaction
+            $this->transactionRepo->createTransfer([
+                'type' => 'transfer',
+                'amount' => $amount,
+                'user_id' => $senderId,
+                'sender_id' => $senderId,
+                'receiver_id' => $receiverId
+            ]);
+
+            DB::commit();
+
+            return [
+                'sender_balance' => $senderWallet->fresh()->balance
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
 }
