@@ -15,6 +15,15 @@ class TransactionController extends Controller
         $this->transactionService = $transactionService;
     }
 
+    public function index(Request $request)
+    {
+        $transactions = $this->transactionService->getTransactions(
+            $request->only('type')
+        );
+
+        return response()->json($transactions);
+    }
+    
     public function deposit(Request $request)
     {
         $data = $request->validate([
@@ -60,4 +69,5 @@ class TransactionController extends Controller
             'balance' => $result['sender_balance']
         ]);
     }
+    
 }

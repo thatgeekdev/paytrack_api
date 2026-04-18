@@ -23,7 +23,7 @@ class TransactionService
         $this->walletRepo = $walletRepo;
         $this->transactionRepo = $transactionRepo;
     }
-
+    
     public function deposit(float $amount)
     {
         $userId = Auth::id();
@@ -179,5 +179,10 @@ class TransactionService
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    public function getTransactions($filters)
+    {
+        return $this->transactionRepo->getUserTransactions(Auth::id(), $filters);
     }
 }
