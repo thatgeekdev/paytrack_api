@@ -11,6 +11,13 @@ class WalletRepository
         return Wallet::where('user_id', $userId)->first();
     }
     
+    public function getForUpdate(int $userId)
+    {
+        return Wallet::where('user_id', $userId)
+            ->lockForUpdate()
+            ->first();
+    }
+    
     public function increment($wallet, $amount)
     {
         $wallet->increment('balance', $amount);

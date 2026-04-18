@@ -92,13 +92,8 @@ class TransactionService
 
         try {
             //faco um lock da linha do remetente e do destinatário na BD para evitar condições de corrida
-            $senderWallet = Wallet::where('user_id', $senderId)
-                ->lockForUpdate()
-                ->first();
-
-            $receiverWallet = Wallet::where('user_id', $receiverId)
-                ->lockForUpdate()
-                ->first();
+            $senderWallet = $this->walletRepo->getForUpdate($senderId);
+            $receiverWallet = $this->walletRepo->getForUpdate($receiverId);
 
             if (!$receiverWallet) {
                 throw new Exception("Receiver not found");
