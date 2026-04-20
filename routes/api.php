@@ -14,15 +14,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/wallet', [WalletController::class, 'show']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('/deposit', [TransactionController::class, 'deposit']);
     Route::post('/withdraw', [TransactionController::class, 'withdraw']);
-});
-
-Route::middleware('auth:sanctum')->group(function () {
     Route::post('/transfer', [TransactionController::class, 'transfer']);
-});
-
-Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transactions', [TransactionController::class, 'index']);
 });
