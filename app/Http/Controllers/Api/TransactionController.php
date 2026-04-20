@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DepositRequest;
+use App\Http\Requests\TransferRequest;
+use App\Http\Requests\WithdrawRequest;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
 
@@ -24,13 +27,9 @@ class TransactionController extends Controller
         return response()->json($transactions);
     }
     
-    public function deposit(Request $request)
+    public function deposit(DepositRequest $request)
     {
-        $data = $request->validate([
-            'amount' => 'required|numeric|min:1'
-        ]);
-
-        $wallet = $this->transactionService->deposit($data['amount']);
+        $wallet = $this->transactionService->deposit($request->amount);
 
         return response()->json([
             'message' => 'Deposit successful',
@@ -38,13 +37,9 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function withdraw(Request $request)
+    public function withdraw(WithdrawRequest $request)
     {
-        $data = $request->validate([
-            'amount' => 'required|numeric|min:1'
-        ]);
-
-        $wallet = $this->transactionService->withdraw($data['amount']);
+        $wallet = $this->transactionService->withdraw($request->amount);
 
         return response()->json([
             'message' => 'Withdraw successful',
@@ -52,16 +47,11 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function transfer(Request $request)
+    public function transfer(TransferRequest $request)
     {
-        $data = $request->validate([
-            'receiver_id' => 'required|exists:users,id',
-            'amount' => 'required|numeric|min:1'
-        ]);
-
         $result = $this->transactionService->transfer(
-            $data['receiver_id'],
-            $data['amount']
+            $request->receiver_id,
+            $request->amount
         );
 
         return response()->json([
