@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Exceptions\InsufficientBalanceException;
 use App\Exceptions\ReceiverNotFoundException;
 use App\Exceptions\TransferToSelfException;
+use App\Models\User;
 use App\Repositories\WalletRepository;
 use App\Repositories\TransactionRepository;
 use Illuminate\Support\Facades\Auth;
@@ -75,7 +76,7 @@ class TransactionService
         $wallet = $this->walletRepo->getByUserId($userId);
 
         if ($wallet->balance < $amount) {
-            throw new ReceiverNotFoundException();
+            throw new InsufficientBalanceException();
         }
 
         DB::beginTransaction();
@@ -121,6 +122,14 @@ class TransactionService
         if ($senderId == $receiverId) {
             throw new TransferToSelfException();
         }
+
+        $receiver = User::with('wallet')->find($receiverId);
+        if (!$receiver || !$receiver->wallet) {
+            throw new ReceiverNotFoundException();
+        }
+        // if ($receiver->status !== 'active') {
+        //     throw new ReceiverNotFoundException();
+        // }
 
         DB::beginTransaction();
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\DepositRequest;
 use App\Http\Requests\TransferRequest;
 use App\Http\Requests\WithdrawRequest;
+use App\Http\Resources\TransactionResource;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
 
@@ -20,11 +21,17 @@ class TransactionController extends Controller
 
     public function index(Request $request)
     {
-        $transactions = $this->transactionService->getTransactions(
-            $request->only('type')
-        );
+        $filters = $request->validate([
+            'type' => 'nullable|in:deposit,withdraw,transfer',
+            'min_amount' => 'nullable|numeric',
+            'max_amount' => 'nullable|numeric',
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date',
+        ]);
+        $transactions = $this->transactionService->getTransactions($filters);
 
-        return response()->json($transactions);
+        // return response()->json($transactions);
+        return TransactionResource::collection($transactions);
     }
     
     public function deposit(DepositRequest $request)
