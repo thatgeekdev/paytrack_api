@@ -19,4 +19,5 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::post('/withdraw', [TransactionController::class, 'withdraw']);
     Route::post('/transfer', [TransactionController::class, 'transfer']);
     Route::get('/transactions', [TransactionController::class, 'index']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
