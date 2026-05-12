@@ -16,6 +16,7 @@ class TransferRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'idempotency_key' => 'required|numericic|min:1|unique:transactions,idempotency_key',
             'receiver_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:1'
         ];

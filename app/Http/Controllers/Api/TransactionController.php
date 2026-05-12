@@ -56,13 +56,26 @@ class TransactionController extends Controller
 
     public function transfer(TransferRequest $request)
     {
+
+        $idempotencyKey = $request->header('Idempotency-Key');
+
+        if (!$idempotencyKey) {
+            return response()->json([
+                'success' => false,
+                'error' => 'IDEMPOTENCY_KEY_REQUIRED',
+                'message' => 'Idempotency-Key header is required'
+            ], 400);
+        }
+
         $result = $this->transactionService->transfer(
             $request->receiver_id,
-            $request->amount
+            $request->amount,
+            $idempotencyKey
         );
 
         return response()->json([
-            'message' => 'Transfer successful',
+            'success' => true,
+            'data' => $result,
             'balance' => $result['sender_balance']
         ]);
     }

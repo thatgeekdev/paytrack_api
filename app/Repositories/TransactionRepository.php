@@ -51,5 +51,9 @@ class TransactionRepository
 
         return $query->latest()->paginate(10);
     }
+    public function findByIdempotencyKey(string $key)
+    {
+        return Transaction::where('idempotency_key', $key)->first();
+    }
 }
 
